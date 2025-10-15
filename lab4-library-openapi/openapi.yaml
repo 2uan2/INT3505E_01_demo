@@ -1,0 +1,223 @@
+openapi: 3.0.4
+info:
+  title: Library API
+  description: Simple API for managing books based on the OpenAPI 3.0 specification
+  version: 0.1.9
+
+servers:
+  - url: http://localhost:5000
+
+paths:
+  /:
+    get:
+      summary: Returns '<h1>Hello world</h1>'
+      responses:
+        "200":
+          description: Returns '<h1>Hello world</h1>'
+          content: 
+            text/html:
+              schema:
+                type: string
+                example: "<h1>Hello world</h1>"
+  /books:
+    get:
+      summary: Returns list of books
+      description: Returns list of books
+      responses:
+        "200":
+          description: A JSON array of books
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Book"
+    post:
+      summary: Creates a new book
+      requestBody:
+        description: Parameters for new book
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Book"
+      responses:
+        "201":
+          description: Book created succesfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Book"
+        "400":
+          description: Missing required fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "409":
+          description: Resource existed
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /books/{isbn}:
+    get:
+      summary: Getting book by isbn
+      parameters:
+        - name: isbn
+          in: path
+          description: Book's isbn
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Book found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Book"
+        "404":
+          description: Book not found
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    put:
+      summary: Editing a book using isbn
+      parameters:
+        - name: isbn
+          in: path
+          description: Book's isbn
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Describe book to be created
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Book"
+      responses:
+        "200":
+          description: Book edited succesfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Book"
+        "400":
+          description: Missing required fields
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Book not found
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      summary: Delete book using isbn
+      parameters:
+        - name: isbn
+          in: path
+          description: Book's isbn
+          required: true
+          schema: 
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Deleted succesfully
+          content:
+            application/json:
+              schema:
+                type: string
+
+  /books/{isbn}/borrow:
+    patch:
+      summary: Borrow a book using isbn
+      parameters:
+        - name: isbn
+          in: path
+          description: Book's isbn
+          required: true
+          schema: 
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Succesfully borrowed book
+          content:
+            application/json:
+              schema:
+                 type: string
+
+        "404":
+          description: Book don't even exist bruh
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "409":
+          description: Book taken
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /books/{isbn}/return:
+    patch:
+      summary: Return a borrowed book using isbn
+      parameters:
+        - name: isbn
+          in: path
+          description: Book's isbn
+          required: true
+          schema: 
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Succesfully returned book
+          content:
+            application/json:
+              schema:
+                 type: string
+        "404":
+          description: Book don't even exist bruh
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "409":
+          description: Book even not borrowed
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+components:
+  schemas:
+    Book:
+      type: object
+      properties:
+        author:
+          type: string
+        borrowed: 
+          type: boolean
+        isbn:
+          type: integer
+        title:
+          type: string
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
