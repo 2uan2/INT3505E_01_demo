@@ -24,7 +24,7 @@ books = [
 
 @app.route('/')
 def home():
-    return '<h1>Hello world</h1>'
+    return '<div>Welcome to uhh, idk, you can checkout the docs at <a href="/docs">docs</a></div>'
 
 @app.route('/books')
 def get_books():
