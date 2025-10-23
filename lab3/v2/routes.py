@@ -1,35 +1,9 @@
-from flask import Flask, jsonify, request, send_from_directory, url_for
-from flask_swagger_ui import get_swaggerui_blueprint
-from flask_cors import CORS
+from flask import jsonify, request, url_for, Blueprint
+from server import books
 
-app = Flask(__name__)
-CORS(app)
+v2_bp = Blueprint("v2", __name__)
 
-SWAGGER_URL = '/docs'
-
-API_URL = '/openapi.yaml'
-
-swagger_blueprint = get_swaggerui_blueprint(SWAGGER_URL, API_URL)
-
-app.register_blueprint(swagger_blueprint)
-
-@app.route('/openapi.yaml')
-def get_openapi_yaml():
-    return send_from_directory('.', 'openapi.yaml')
-
-books = [
-    {"isbn": 100, "title": "The Hobbit", "author": "J.R.R. Tolkien", "borrowed": True},
-    {"isbn": 101, "title": "The Hobbit", "author": "J.R.R. Tolkien", "borrowed": True},
-    {"isbn": 102, "title": "The", "author": "J.R.R. Tolkien", "borrowed": True},
-    {"isbn": 110, "title": "Thet", "author": "J.R.R. Tolkien", "borrowed": True},
-    {"isbn": 200, "title": "1984", "author": "George Orwell", "borrowed": False}
-]
-
-@app.route('/')
-def home():
-    return '<div>Welcome to uhh, idk, you can checkout the docs at <a href="/docs">docs</a></div>'
-
-@app.route('/v2/books')
+@v2_bp.route('/books')
 def get_books():
     # offset = request.args.get("offset", type=int, default=0)
     # limit = request.args.get("limit", type=int, default=len(books))
@@ -85,19 +59,13 @@ def get_books():
             "next_cursor": next_cursor
         })
 
-@app.route("/v1/books")
-def get_books_v1():
-    # for book in books:
-    #     book['new_field'] = 1
-    return books
-
-@app.route('/v2/books/<int:isbn>')
+@v2_bp.route('/books/<int:isbn>')
 def get_book(isbn: int):
     book = [book for book in books if book['isbn'] == isbn]
     print(book)
     return book[0] if book else (jsonify({'error': 'no book with that isbn'}), 404)
 
-@app.route('/v2/books', methods=['POST'])
+@v2_bp.route('/books', methods=['POST'])
 def create_book():
     try:
         isbn = int(request.json['isbn'])
@@ -114,7 +82,7 @@ def create_book():
     books.append(book)
     return book, 201
 
-@app.route("/v2/books/<int:isbn>", methods=['PUT'])
+@v2_bp.route("/books/<int:isbn>", methods=['PUT'])
 def update_book(isbn: int):
     try:
         title = request.json['title']
@@ -133,7 +101,7 @@ def update_book(isbn: int):
     if not found:
         return {'error': 'no book with that isbn lol'}, 404
 
-@app.route("/v2/books/<int:isbn>", methods=["DELETE"])
+@v2_bp.route("/books/<int:isbn>", methods=["DELETE"])
 def delete_book(isbn: int):
     if isbn not in [book['isbn'] for book in books]:
         return "didn't even exist lol", 200
@@ -144,7 +112,7 @@ def delete_book(isbn: int):
 
     return 'done', 200
 
-@app.route("/v2/books/<int:isbn>/borrow", methods=['PATCH'])
+@v2_bp.route("/books/<int:isbn>/borrow", methods=['PATCH'])
 def borrow_book(isbn: int):
     if isbn not in [book['isbn'] for book in books]:
         return {"error": "didn't even exist lol"}, 404
@@ -160,7 +128,7 @@ def borrow_book(isbn: int):
         return {'error': "taken bruv"}, 409
 
 
-@app.route("/v2/books/<int:isbn>/return", methods=['PATCH'])
+@v2_bp.route("/books/<int:isbn>/return", methods=['PATCH'])
 def return_book(isbn: int):
     if isbn not in [book['isbn'] for book in books]:
         return {"error": "didn't even exist lol"}, 404
@@ -175,7 +143,7 @@ def return_book(isbn: int):
     else:
         return {'error': "what? not even taken man"}, 409
     
-# @app.route("/books")
+# @v2_bp.route("/books")
 # def get_offseted_books(offset: int, limit: int):
 #     print("limit is: ", limit)
 #     print("offset is: ", offset)
@@ -209,6 +177,3 @@ def apply_cursor(items, cursor=None, limit=2):
     end = start + limit
     next_cursor = items[end - 1]["isbn"] if end < len(items) else None
     return items[start:end], next_cursor
-
-if __name__ == '__main__':
-    app.run(host="0.0.0.0", debug=True)
