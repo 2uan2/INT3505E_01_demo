@@ -19,7 +19,23 @@ books = [
     {"isbn": 101, "title": "The Hobbit", "author": "J.R.R. Tolkien", "borrowed": True},
     {"isbn": 102, "title": "The", "author": "J.R.R. Tolkien", "borrowed": True},
     {"isbn": 110, "title": "Thet", "author": "J.R.R. Tolkien", "borrowed": True},
-    {"isbn": 200, "title": "1984", "author": "George Orwell", "borrowed": False}
+    {"isbn": 200, "title": "1984", "author": "George Orwell", "borrowed": False},
+    {"isbn": 300, "title": "The Hobbit", "author": "J.R.R. Tolkien", "borrowed": True},
+    {"isbn": 400, "title": "The Hobbit", "author": "J.R.R. Tolkien", "borrowed": True},
+    {"isbn": 500, "title": "The Hobbit", "author": "J.R.R. Tolkien", "borrowed": True},
+    {"isbn": 600, "title": "The Hobbit", "author": "J.R.R. Tolkien", "borrowed": True},
+    {"isbn": 700, "title": "The", "author": "J.R.R. Tolkien", "borrowed": True},
+    {"isbn": 800, "title": "Thet", "author": "J.R.R. Tolkien", "borrowed": True},
+    {"isbn": 900, "title": "1984", "author": "George Orwell", "borrowed": False},
+    {"isbn": 1000, "title": "The Hobbit", "author": "J.R.R. Tolkien", "borrowed": True},
+    {"isbn": 1100, "title": "The", "author": "J.R.R. Tolkien", "borrowed": True},
+    {"isbn": 1200, "title": "Thet", "author": "J.R.R. Tolkien", "borrowed": True},
+    {"isbn": 1300, "title": "1984", "author": "George Orwell", "borrowed": False},
+    {"isbn": 1400, "title": "The Hobbit", "author": "J.R.R. Tolkien", "borrowed": True},
+    {"isbn": 1500, "title": "The", "author": "J.R.R. Tolkien", "borrowed": True},
+    {"isbn": 1600, "title": "Thet", "author": "J.R.R. Tolkien", "borrowed": True},
+    {"isbn": 1700, "title": "1984", "author": "George Orwell", "borrowed": False},
+
 ]
 
 

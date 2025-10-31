@@ -1,0 +1,255 @@
+openapi: 3.0.4
+info:
+  description: Simple API for managing books based on the OpenAPI 3.0 specification
+  title: Library API
+  version: 0.1.9
+servers:
+- url: http://localhost:5000
+paths:
+  /:
+    get:
+      operationId: root_get
+      responses:
+        "200":
+          content:
+            text/html:
+              schema:
+                example: <h1>Hello world</h1>
+                type: string
+          description: Returns '<h1>Hello world</h1>'
+      summary: Returns '<h1>Hello world</h1>'
+      x-openapi-router-controller: openapi_server.controllers.default_controller
+  /books:
+    get:
+      description: Returns list of books
+      operationId: books_get
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/Book"
+                type: array
+          description: A JSON array of books
+      summary: Returns list of books
+      x-openapi-router-controller: openapi_server.controllers.default_controller
+    post:
+      operationId: books_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Book"
+        description: Parameters for new book
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Book"
+          description: Book created succesfully
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Missing required fields
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Resource existed
+      summary: Creates a new book
+      x-openapi-router-controller: openapi_server.controllers.default_controller
+  /books/{isbn}:
+    delete:
+      operationId: books_isbn_delete
+      parameters:
+      - description: Book's isbn
+        explode: false
+        in: path
+        name: isbn
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Deleted succesfully
+      summary: Delete book using isbn
+      x-openapi-router-controller: openapi_server.controllers.default_controller
+    get:
+      operationId: books_isbn_get
+      parameters:
+      - description: Book's isbn
+        explode: false
+        in: path
+        name: isbn
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Book"
+          description: Book found
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Book not found
+      summary: Getting book by isbn
+      x-openapi-router-controller: openapi_server.controllers.default_controller
+    put:
+      operationId: books_isbn_put
+      parameters:
+      - description: Book's isbn
+        explode: false
+        in: path
+        name: isbn
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Book"
+        description: Describe book to be created
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Book"
+          description: Book edited succesfully
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Missing required fields
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Book not found
+      summary: Editing a book using isbn
+      x-openapi-router-controller: openapi_server.controllers.default_controller
+  /books/{isbn}/borrow:
+    patch:
+      operationId: books_isbn_borrow_patch
+      parameters:
+      - description: Book's isbn
+        explode: false
+        in: path
+        name: isbn
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Succesfully borrowed book
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Book don't even exist bruh
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Book taken
+      summary: Borrow a book using isbn
+      x-openapi-router-controller: openapi_server.controllers.default_controller
+  /books/{isbn}/return:
+    patch:
+      operationId: books_isbn_return_patch
+      parameters:
+      - description: Book's isbn
+        explode: false
+        in: path
+        name: isbn
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Succesfully returned book
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Book don't even exist bruh
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Book even not borrowed
+      summary: Return a borrowed book using isbn
+      x-openapi-router-controller: openapi_server.controllers.default_controller
+components:
+  schemas:
+    Book:
+      example:
+        author: author
+        isbn: 0
+        title: title
+        borrowed: true
+      properties:
+        author:
+          title: author
+          type: string
+        borrowed:
+          title: borrowed
+          type: boolean
+        isbn:
+          title: isbn
+          type: integer
+        title:
+          title: title
+          type: string
+      title: Book
+      type: object
+    Error:
+      example:
+        error: error
+      properties:
+        error:
+          title: error
+          type: string
+      title: Error
+      type: object
