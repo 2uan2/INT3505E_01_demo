@@ -1,7 +1,7 @@
 openapi: 3.0.4
 info:
-  title: Library API
-  description: Simple API for managing books based on the OpenAPI 3.0 specification
+  title: Product API
+  description: Simple API for managing products based on the OpenAPI 3.0 specification
   version: 1.0.0
 
 servers:
@@ -19,35 +19,40 @@ paths:
               schema:
                 type: string
                 example: "<h1>Hello world</h1>"
-  /books:
+
+  /api/v1/products:
     get:
-      summary: Returns list of books
-      description: Returns list of books
+      summary: Returns list of all products
+      description: Returns list of all products
+      tags:
+        - Products
       responses:
         "200":
-          description: A JSON array of books
+          description: A JSON array of products
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Book"
+                  $ref: "#/components/schemas/ProductResponse"
     post:
-      summary: Creates a new book
+      summary: Creates a new product
+      tags:
+        - Products
       requestBody:
-        description: Parameters for new book
+        description: Parameters for new product
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Book"
+              $ref: "#/components/schemas/ProductCreateRequest"
       responses:
         "201":
-          description: Book created succesfully
+          description: Product created successfully
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Book"
+                $ref: "#/components/schemas/ProductResponse"
         "400":
           description: Missing required fields
           content:
@@ -55,60 +60,56 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
         "409":
-          description: Resource existed
+          description: Resource already existed
           content: 
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
 
-  /books/{isbn}:
+  /api/v1/products/{id}:
+    parameters:
+      - name: id
+        in: path
+        description: Product's id
+        required: true
+        schema:
+          type: integer
+          format: int64
     get:
-      summary: Getting book by isbn
-      parameters:
-        - name: isbn
-          in: path
-          description: Book's isbn
-          required: true
-          schema:
-            type: integer
-            format: int64
+      summary: Getting product by id
+      tags:
+        - Products
       responses:
         "200":
-          description: Book found
+          description: Product found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Book"
+                $ref: "#/components/schemas/ProductResponse"
         "404":
-          description: Book not found
+          description: Product not found
           content: 
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
     put:
-      summary: Editing a book using isbn
-      parameters:
-        - name: isbn
-          in: path
-          description: Book's isbn
-          required: true
-          schema:
-            type: integer
-            format: int64
+      summary: Edit a product using id
+      tags:
+        - Products
       requestBody:
-        description: Describe book to be created
+        description: Describe product to be edited
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Book"
+              $ref: "#/components/schemas/ProductCreateRequest"
       responses:
         "200":
-          description: Book edited succesfully
+          description: Product edited successfully
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Book"
+                $ref: "#/components/schemas/ProductResponse"
         "400":
           description: Missing required fields
           content: 
@@ -116,108 +117,147 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
         "404":
-          description: Book not found
+          description: Product not found
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    patch:
+      summary: Edit a product using id
+      tags:
+        - Products
+      requestBody:
+        description: Describe product to be edited
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductPatchRequest"
+      responses:
+        "200":
+          description: Product edited successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductResponse"
+        "400":
+          description: Missing required fields
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Product not found
           content: 
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
     delete:
-      summary: Delete book using isbn
-      parameters:
-        - name: isbn
-          in: path
-          description: Book's isbn
-          required: true
-          schema: 
-            type: integer
-            format: int64
+      summary: Delete product using id
+      tags:
+        - Products
       responses:
-        "200":
-          description: Deleted succesfully
+        "204":
+          description: Deleted successfully
           content:
             application/json:
               schema:
                 type: string
 
-  /books/{isbn}/borrow:
-    patch:
-      summary: Borrow a book using isbn
-      parameters:
-        - name: isbn
-          in: path
-          description: Book's isbn
-          required: true
-          schema: 
-            type: integer
-            format: int64
-      responses:
-        "200":
-          description: Succesfully borrowed book
-          content:
-            application/json:
-              schema:
-                 type: string
-
-        "404":
-          description: Book don't even exist bruh
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-        "409":
-          description: Book taken
-          content: 
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-
-  /books/{isbn}/return:
-    patch:
-      summary: Return a borrowed book using isbn
-      parameters:
-        - name: isbn
-          in: path
-          description: Book's isbn
-          required: true
-          schema: 
-            type: integer
-            format: int64
-      responses:
-        "200":
-          description: Succesfully returned book
-          content:
-            application/json:
-              schema:
-                 type: string
-        "404":
-          description: Book don't even exist bruh
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-        "409":
-          description: Book even not borrowed
-          content: 
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-
 components:
   schemas:
-    Book:
+    ProductResponse:
       type: object
       properties:
-        author:
-          type: string
-        borrowed: 
-          type: boolean
-        isbn:
+        id:
           type: integer
-        title:
+          description: Product's id, autoincrement
+          example: 1
+        name:
           type: string
+          description: Product's name
+          example: Dell precision 5540 laptop
+        description: 
+          type: string
+          description: Product's description
+          example: Dell workstation, i7 9th generation
+        price:
+          type: number
+          description: Product's price
+          example: 999.99
+        sku: 
+          type: string
+          description: Product's sku
+          example: LP-XYZ-001
+        quantity:
+          type: integer
+          description: Product's quantity
+          example: 100
+        created_at:
+          type: integer
+          description: When the product was added to database
+          example: 102983902181
+        updated_at:
+          type: integer
+          description: When the product was last modified
+          example: 102983902183
+
+    ProductCreateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Product's name
+          example: Dell precision 5540 laptop
+        description: 
+          type: string
+          description: Product's description
+          example: Dell workstation, i7 9th generation
+        price:
+          type: number
+          description: Product's price
+          example: 999.99
+        sku: 
+          type: string
+          description: Product's sku
+          example: LP-XYZ-001
+        quantity:
+          type: integer
+          description: Product's quantity
+          example: 100
+      required:
+        - name
+        - price
+        - quantity
+
+    ProductPatchRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Product's name
+          example: Dell precision 5540 laptop
+        description: 
+          type: string
+          description: Product's description
+          example: Dell workstation, i7 9th generation
+        price:
+          type: number
+          description: Product's price
+          example: 999.99
+        sku: 
+          type: string
+          description: Product's sku
+          example: LP-XYZ-001
+        quantity:
+          type: integer
+          description: Product's quantity
+          example: 100
 
     Error:
       type: object
       properties:
         error:
           type: string
+          description: String representation of the error that occurred
+          example: Product's price is missing
