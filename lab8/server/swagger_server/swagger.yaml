@@ -66,9 +66,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
-  /api/v1/products/{product_id}:
+  /api/v1/products/{id}:
     parameters:
-      - name: product_id
+      - name: id
         in: path
         description: Product's id
         required: true
