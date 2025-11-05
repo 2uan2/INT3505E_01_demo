@@ -1,0 +1,314 @@
+openapi: 3.0.4
+info:
+  title: Product API
+  description: Simple API for managing products based on the OpenAPI 3.0 specification
+  version: 1.0.0
+servers:
+- url: http://localhost:5000
+paths:
+  /:
+    get:
+      summary: Returns '<h1>Hello world</h1>'
+      operationId: root_get
+      responses:
+        "200":
+          description: Returns '<h1>Hello world</h1>'
+          content:
+            text/html:
+              schema:
+                type: string
+                example: <h1>Hello world</h1>
+                x-content-type: text/html
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+  /api/v1/products:
+    get:
+      tags:
+      - Products
+      summary: Returns list of all products
+      description: Returns list of all products
+      operationId: api_v1_products_get
+      responses:
+        "200":
+          description: A JSON array of products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProductResponse"
+                x-content-type: application/json
+      x-openapi-router-controller: swagger_server.controllers.products_controller
+    post:
+      tags:
+      - Products
+      summary: Creates a new product
+      operationId: api_v1_products_post
+      requestBody:
+        description: Parameters for new product
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductCreateRequest"
+        required: true
+      responses:
+        "201":
+          description: Product created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductResponse"
+        "400":
+          description: Missing required fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "409":
+          description: Resource already existed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      x-openapi-router-controller: swagger_server.controllers.products_controller
+  /api/v1/products/{id}:
+    get:
+      tags:
+      - Products
+      summary: Getting product by id
+      operationId: api_v1_products_id_get
+      parameters:
+      - name: id
+        in: path
+        description: Product's id
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Product found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductResponse"
+        "404":
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      x-openapi-router-controller: swagger_server.controllers.products_controller
+    put:
+      tags:
+      - Products
+      summary: Edit a product using id
+      operationId: api_v1_products_id_put
+      parameters:
+      - name: id
+        in: path
+        description: Product's id
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        description: Describe product to be edited
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductCreateRequest"
+        required: true
+      responses:
+        "200":
+          description: Product edited successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductResponse"
+        "400":
+          description: Missing required fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      x-openapi-router-controller: swagger_server.controllers.products_controller
+    delete:
+      tags:
+      - Products
+      summary: Delete product using id
+      operationId: api_v1_products_id_delete
+      parameters:
+      - name: id
+        in: path
+        description: Product's id
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "204":
+          description: Deleted successfully
+          content:
+            application/json:
+              schema:
+                type: string
+                x-content-type: application/json
+      x-openapi-router-controller: swagger_server.controllers.products_controller
+    patch:
+      tags:
+      - Products
+      summary: Edit a product using id
+      operationId: api_v1_products_id_patch
+      parameters:
+      - name: id
+        in: path
+        description: Product's id
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        description: Describe product to be edited
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductPatchRequest"
+        required: true
+      responses:
+        "200":
+          description: Product edited successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductResponse"
+        "400":
+          description: Missing required fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      x-openapi-router-controller: swagger_server.controllers.products_controller
+components:
+  schemas:
+    ProductResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: "Product's id, autoincrement"
+          example: 1
+        name:
+          type: string
+          description: Product's name
+          example: Dell precision 5540 laptop
+        description:
+          type: string
+          description: Product's description
+          example: "Dell workstation, i7 9th generation"
+        price:
+          type: number
+          description: Product's price
+          example: 999.99
+        sku:
+          type: string
+          description: Product's sku
+          example: LP-XYZ-001
+        quantity:
+          type: integer
+          description: Product's quantity
+          example: 100
+        created_at:
+          type: integer
+          description: When the product was added to database
+          example: 102983902181
+        updated_at:
+          type: integer
+          description: When the product was last modified
+          example: 102983902183
+      example:
+        quantity: 100
+        updated_at: 102983902183
+        price: 999.99
+        name: Dell precision 5540 laptop
+        description: "Dell workstation, i7 9th generation"
+        created_at: 102983902181
+        id: 1
+        sku: LP-XYZ-001
+    ProductCreateRequest:
+      required:
+      - name
+      - price
+      - quantity
+      type: object
+      properties:
+        name:
+          type: string
+          description: Product's name
+          example: Dell precision 5540 laptop
+        description:
+          type: string
+          description: Product's description
+          example: "Dell workstation, i7 9th generation"
+        price:
+          type: number
+          description: Product's price
+          example: 999.99
+        sku:
+          type: string
+          description: Product's sku
+          example: LP-XYZ-001
+        quantity:
+          type: integer
+          description: Product's quantity
+          example: 100
+    ProductPatchRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Product's name
+          example: Dell precision 5540 laptop
+        description:
+          type: string
+          description: Product's description
+          example: "Dell workstation, i7 9th generation"
+        price:
+          type: number
+          description: Product's price
+          example: 999.99
+        sku:
+          type: string
+          description: Product's sku
+          example: LP-XYZ-001
+        quantity:
+          type: integer
+          description: Product's quantity
+          example: 100
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: String representation of the error that occurred
+          example: Product's price is missing
+
