@@ -1,31 +1,32 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request
 import requests
 import base64
 import uuid
-from flask_jwt_extended import JWTManager, create_access_token, get_jwt_identity, jwt_required
 
 app = Flask(__name__)
-app.config['JWT_SECRET_KEY'] = 'super-secret'
-jwt = JWTManager(app)
 
 users = []
 sessions = {}
 
 @app.route("/register", methods=['POST'])
 def register():
-    username = request.json.get('username', None)
-    password = request.json.get('password', None)
-    if username not in [user['username'] for user in users]:
-        new_user = {
-            'username': username,
-            'password': password,
-        }
-        users.append(new_user)
-
-        token = create_access_token(identity=username)
-        return jsonify(access_token=token)
-    else: 
-        return {'message': 'username unavailable'}, 409
+    try: 
+        username = request.json['username']
+        password = request.json['password']
+        if username not in [user['username'] for user in users]:
+            cookie = uuid.uuid4()
+            new_user = {
+                'username': username,
+                'password': password,
+            }
+            sessions[str(cookie)] = new_user
+            users.append(new_user)
+            return {'cookie': cookie}, 201
+        else: 
+            return {'message': 'username unavailable'}, 409
+    except Exception as e:
+        print(e)
+        return {'message': 'something went wrong'}, 500
 
 @app.route("/login", methods=['POST'])
 def login():
@@ -34,8 +35,9 @@ def login():
         password = request.json['password']
         for user in users:
             if username == user['username'] and password == user['password']:
-                token = create_access_token(identity=username)
-                return jsonify(access_token=token)
+                cookie = uuid.uuid4()
+                sessions[str(cookie)] = user
+                return {'cookie': cookie}, 200
 
         return {'message': 'wrong credential'}, 409
     except:
@@ -50,15 +52,12 @@ def logout():
         return {'message': 'something went wrong'}, 500
 
 @app.route("/private")
-@jwt_required()
 def private_route():
     user = authenticate_request(request)
-    if not user:
-        user = get_jwt_identity()
 
     if not user:
         return {'message': 'wrong credentials'}, 401
-    return f'secret content for {user}\n'
+    return 'secret content\n'
 
 def authenticate_request(request):
     print(request.headers.get('Authorization'))
