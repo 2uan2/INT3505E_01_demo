@@ -8,3 +8,4 @@ htmlcov/
 .tox/
 docs/_build/
 swagger-codegen-cli.jar
+*.sqlite3
