@@ -3,7 +3,7 @@ from jose import jwt
 import requests
 
 app = Flask(__name__)
-jwks = requests.get('http://192.168.100.102:8080/realms/test/protocol/openid-connect/certs').json()
+jwks = requests.get('http://localhost:8080/realms/test/protocol/openid-connect/certs').json()
 
 @app.route('/')
 def root():

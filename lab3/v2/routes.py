@@ -4,7 +4,7 @@ from server import books
 v2_bp = Blueprint("v2", __name__)
 
 @v2_bp.route('/books')
-def get_books():
+def get_books_v2():
     # offset = request.args.get("offset", type=int, default=0)
     # limit = request.args.get("limit", type=int, default=len(books))
     # returned_books = []

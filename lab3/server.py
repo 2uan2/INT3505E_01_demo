@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, url_for
+from flask import Flask, jsonify, request, url_for, redirect
 from flask_cors import CORS
 
 def create_app():
@@ -41,10 +41,24 @@ books = [
 
 
 if __name__ == '__main__':
+    from v1.routes import get_books_v1
+    from v2.routes import get_books_v2
     app = create_app()
 
     @app.route('/')
     def home():
         return '<div>Welcome to somewhere INT3505E_01</div>'
+
+    @app.route('/books')
+    def xapi():
+        version = int(request.headers.get("X-API-Version"))
+        print(version)
+        if version == 1:
+            return get_books_v1()
+        elif version == 2:
+            return get_books_v2()
+        else:
+            return get_books_v2()
+
 
     app.run(host="0.0.0.0", debug=True)

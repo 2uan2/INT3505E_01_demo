@@ -52,7 +52,7 @@ def api_v1_products_id_delete(id_):  # noqa: E501
     product = db.get_or_404(Product, id_)
     db.session.delete(product)
     db.session.commit()
-    return 200
+    return product
 
 
 def api_v1_products_id_get(id_):  # noqa: E501
@@ -102,7 +102,7 @@ def api_v1_products_id_patch(body, id_):  # noqa: E501
 
     product.updated_at = int(time.time())
     db.session.commit()
-    return 'do some magic!'
+    return product
 
 
 def api_v1_products_id_put(body, id_):
@@ -126,7 +126,7 @@ def api_v1_products_id_put(body, id_):
 
     product.updated_at = int(time.time())
     db.session.commit()
-    return 'do some magic!'
+    return product
 
 
 def api_v1_products_post(body):  # noqa: E501
